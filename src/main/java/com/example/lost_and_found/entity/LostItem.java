@@ -7,54 +7,59 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "lost_items")
 public class LostItem {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false)
     private String personName;
-    
+
     @Column(nullable = false)
-    private String age;
-    
+    private Integer age;   // ✅ FIXED
+
     @Column(nullable = false)
-    private String gender;
-    
+    private String gender; // ✅ FIXED (MALE / FEMALE / OTHER)
+
     @Column(nullable = false, length = 1000)
     private String description;
-    
+
     @Column(nullable = false)
     private String lastSeenLocation;
-    
+
     @Column(nullable = false)
     private LocalDate lostDate;
-    
+
     @Column(nullable = false)
     private String reporterName;
-    
+
     @Column(nullable = false)
     private String reporterContact;
-    
+
     @Column(nullable = false)
     private String status;
-    
+
     @ManyToOne
-    @JoinColumn(name = "reported_by")
+    @JoinColumn(name = "reported_by", nullable = false)
     private User reportedBy;
-    
+
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-    
+    private LocalDateTime createdAt;
+
     private String imageUrl;
-    
+
+    // ---------- Constructors ----------
+
     public LostItem() {
+        this.createdAt = LocalDateTime.now();
     }
-    
-    public LostItem(Long id, String personName, String age, String gender, String description,
-                   String lastSeenLocation, LocalDate lostDate, String reporterName,
-                   String reporterContact, String status, User reportedBy,
-                   LocalDateTime createdAt, String imageUrl) {
+
+    public LostItem(Long id, String personName, Integer age, String gender,
+                    String description, String lastSeenLocation,
+                    LocalDate lostDate, String reporterName,
+                    String reporterContact, String status,
+                    User reportedBy, LocalDateTime createdAt,
+                    String imageUrl) {
         this.id = id;
         this.personName = personName;
         this.age = age;
@@ -66,9 +71,11 @@ public class LostItem {
         this.reporterContact = reporterContact;
         this.status = status;
         this.reportedBy = reportedBy;
-        this.createdAt = createdAt;
+        this.createdAt = createdAt != null ? createdAt : LocalDateTime.now();
         this.imageUrl = imageUrl;
     }
+
+    // ---------- Getters & Setters ----------
 
     public Long getId() {
         return id;
@@ -86,11 +93,11 @@ public class LostItem {
         this.personName = personName;
     }
 
-    public String getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(String age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -174,20 +181,17 @@ public class LostItem {
         this.imageUrl = imageUrl;
     }
 
+    // ---------- toString ----------
+
     @Override
     public String toString() {
         return "LostItem{" +
                 "id=" + id +
                 ", personName='" + personName + '\'' +
-                ", age='" + age + '\'' +
+                ", age=" + age +
                 ", gender='" + gender + '\'' +
-                ", description='" + description + '\'' +
-                ", lastSeenLocation='" + lastSeenLocation + '\'' +
-                ", lostDate=" + lostDate +
-                ", reporterName='" + reporterName + '\'' +
-                ", reporterContact='" + reporterContact + '\'' +
                 ", status='" + status + '\'' +
-                ", createdAt=" + createdAt +
+                ", lostDate=" + lostDate +
                 '}';
     }
 }

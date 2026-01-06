@@ -3,20 +3,30 @@ package com.example.lost_and_found.dto;
 import java.time.LocalDate;
 
 public class FoundItemRequest {
+
     private String personName;
-    private String age;
+    private Integer age;          // ✅ Integer
     private String gender;
     private String description;
     private String location;
     private LocalDate foundDate;
     private String contactNumber;
     private String imageUrl;
-    
+
     public FoundItemRequest() {
     }
-    
-    public FoundItemRequest(String personName, String age, String gender, String description,
-                           String location, LocalDate foundDate, String contactNumber, String imageUrl) {
+
+    // ✅ Constructor fixed (Integer age)
+    public FoundItemRequest(
+            String personName,
+            Integer age,
+            String gender,
+            String description,
+            String location,
+            LocalDate foundDate,
+            String contactNumber,
+            String imageUrl) {
+
         this.personName = personName;
         this.age = age;
         this.gender = gender;
@@ -35,11 +45,11 @@ public class FoundItemRequest {
         this.personName = personName;
     }
 
-    public String getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(String age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 

@@ -3,8 +3,9 @@ package com.example.lost_and_found.dto;
 import java.time.LocalDate;
 
 public class LostItemRequest {
+
     private String personName;
-    private String age;
+    private Integer age;
     private String gender;
     private String description;
     private String lastSeenLocation;
@@ -12,13 +13,16 @@ public class LostItemRequest {
     private String reporterName;
     private String reporterContact;
     private String imageUrl;
-    
+
+    // No-args constructor
     public LostItemRequest() {
     }
-    
-    public LostItemRequest(String personName, String age, String gender, String description,
-                          String lastSeenLocation, LocalDate lostDate, String reporterName,
-                          String reporterContact, String imageUrl) {
+
+    // All-args constructor
+    public LostItemRequest(String personName, Integer age, String gender,
+                           String description, String lastSeenLocation,
+                           LocalDate lostDate, String reporterName,
+                           String reporterContact, String imageUrl) {
         this.personName = personName;
         this.age = age;
         this.gender = gender;
@@ -38,11 +42,11 @@ public class LostItemRequest {
         this.personName = personName;
     }
 
-    public String getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(String age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 

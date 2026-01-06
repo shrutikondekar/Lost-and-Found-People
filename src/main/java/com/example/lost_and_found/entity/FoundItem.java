@@ -16,7 +16,7 @@ public class FoundItem {
     private String personName;
     
     @Column(nullable = false)
-    private String age;
+    private Integer age;
     
     @Column(nullable = false)
     private String gender;
@@ -47,7 +47,7 @@ public class FoundItem {
     public FoundItem() {
     }
     
-    public FoundItem(Long id, String personName, String age, String gender, String description,
+    public FoundItem(Long id, String personName, Integer age, String gender, String description,
                     String location, LocalDate foundDate, String status, User reportedBy,
                     LocalDateTime createdAt, String contactNumber, String imageUrl) {
         this.id = id;
@@ -80,15 +80,16 @@ public class FoundItem {
         this.personName = personName;
     }
 
-    public String getAge() {
-        return age;
-    }
+   
+    public Integer getAge() {
+		return age;
+	}
 
-    public void setAge(String age) {
-        this.age = age;
-    }
+	public void setAge(Integer age) {
+		this.age = age;
+	}
 
-    public String getGender() {
+	public String getGender() {
         return gender;
     }
 

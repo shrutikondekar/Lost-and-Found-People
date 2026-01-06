@@ -29,7 +29,8 @@ public class FoundItemService {
 
     public FoundItem getFoundItemById(Long id) {
         return foundItemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Found item not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Found item not found with id: " + id));
     }
 
     public List<FoundItem> searchFoundItems(String keyword) {
@@ -45,19 +46,26 @@ public class FoundItemService {
     }
 
     public FoundItem createFoundItem(FoundItemRequest request) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         FoundItem foundItem = new FoundItem();
+
         foundItem.setPersonName(request.getPersonName());
-        foundItem.setAge(request.getAge());
+        foundItem.setAge(request.getAge());              // ✅ Integer → Integer
         foundItem.setGender(request.getGender());
         foundItem.setDescription(request.getDescription());
         foundItem.setLocation(request.getLocation());
         foundItem.setFoundDate(request.getFoundDate());
         foundItem.setContactNumber(request.getContactNumber());
         foundItem.setImageUrl(request.getImageUrl());
+
         foundItem.setStatus("FOUND");
         foundItem.setReportedBy(user);
         foundItem.setCreatedAt(LocalDateTime.now());
@@ -66,8 +74,9 @@ public class FoundItemService {
     }
 
     public FoundItem updateFoundItem(Long id, FoundItemRequest request) {
+
         FoundItem foundItem = getFoundItemById(id);
-        
+
         foundItem.setPersonName(request.getPersonName());
         foundItem.setAge(request.getAge());
         foundItem.setGender(request.getGender());

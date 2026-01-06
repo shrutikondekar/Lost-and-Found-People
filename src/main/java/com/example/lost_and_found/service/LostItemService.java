@@ -29,7 +29,8 @@ public class LostItemService {
 
     public LostItem getLostItemById(Long id) {
         return lostItemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Lost item not found with id: " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Lost item not found with id: " + id));
     }
 
     public List<LostItem> searchLostItems(String keyword) {
@@ -45,13 +46,17 @@ public class LostItemService {
     }
 
     public LostItem createLostItem(LostItemRequest request) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        String username = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
         LostItem lostItem = new LostItem();
         lostItem.setPersonName(request.getPersonName());
-        lostItem.setAge(request.getAge());
+        lostItem.setAge(request.getAge());              // ✅ Integer → Integer
         lostItem.setGender(request.getGender());
         lostItem.setDescription(request.getDescription());
         lostItem.setLastSeenLocation(request.getLastSeenLocation());
@@ -67,8 +72,9 @@ public class LostItemService {
     }
 
     public LostItem updateLostItem(Long id, LostItemRequest request) {
+
         LostItem lostItem = getLostItemById(id);
-        
+
         lostItem.setPersonName(request.getPersonName());
         lostItem.setAge(request.getAge());
         lostItem.setGender(request.getGender());
@@ -94,10 +100,14 @@ public class LostItemService {
     }
 
     public List<LostItem> getMyLostItems() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        String username = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+
         return lostItemRepository.findByReportedBy(user);
     }
 }
