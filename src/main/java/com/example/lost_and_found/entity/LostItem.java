@@ -1,17 +1,11 @@
 package com.example.lost_and_found.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "lost_items")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class LostItem {
     
     @Id
@@ -43,7 +37,7 @@ public class LostItem {
     private String reporterContact;
     
     @Column(nullable = false)
-    private String status; // LOST, FOUND, CLOSED
+    private String status;
     
     @ManyToOne
     @JoinColumn(name = "reported_by")
@@ -53,4 +47,147 @@ public class LostItem {
     private LocalDateTime createdAt = LocalDateTime.now();
     
     private String imageUrl;
+    
+    public LostItem() {
+    }
+    
+    public LostItem(Long id, String personName, String age, String gender, String description,
+                   String lastSeenLocation, LocalDate lostDate, String reporterName,
+                   String reporterContact, String status, User reportedBy,
+                   LocalDateTime createdAt, String imageUrl) {
+        this.id = id;
+        this.personName = personName;
+        this.age = age;
+        this.gender = gender;
+        this.description = description;
+        this.lastSeenLocation = lastSeenLocation;
+        this.lostDate = lostDate;
+        this.reporterName = reporterName;
+        this.reporterContact = reporterContact;
+        this.status = status;
+        this.reportedBy = reportedBy;
+        this.createdAt = createdAt;
+        this.imageUrl = imageUrl;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getPersonName() {
+        return personName;
+    }
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLastSeenLocation() {
+        return lastSeenLocation;
+    }
+
+    public void setLastSeenLocation(String lastSeenLocation) {
+        this.lastSeenLocation = lastSeenLocation;
+    }
+
+    public LocalDate getLostDate() {
+        return lostDate;
+    }
+
+    public void setLostDate(LocalDate lostDate) {
+        this.lostDate = lostDate;
+    }
+
+    public String getReporterName() {
+        return reporterName;
+    }
+
+    public void setReporterName(String reporterName) {
+        this.reporterName = reporterName;
+    }
+
+    public String getReporterContact() {
+        return reporterContact;
+    }
+
+    public void setReporterContact(String reporterContact) {
+        this.reporterContact = reporterContact;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public User getReportedBy() {
+        return reportedBy;
+    }
+
+    public void setReportedBy(User reportedBy) {
+        this.reportedBy = reportedBy;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "LostItem{" +
+                "id=" + id +
+                ", personName='" + personName + '\'' +
+                ", age='" + age + '\'' +
+                ", gender='" + gender + '\'' +
+                ", description='" + description + '\'' +
+                ", lastSeenLocation='" + lastSeenLocation + '\'' +
+                ", lostDate=" + lostDate +
+                ", reporterName='" + reporterName + '\'' +
+                ", reporterContact='" + reporterContact + '\'' +
+                ", status='" + status + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
+    }
 }

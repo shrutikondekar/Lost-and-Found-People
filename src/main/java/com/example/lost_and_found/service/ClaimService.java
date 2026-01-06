@@ -60,7 +60,7 @@ public class ClaimService {
         claimRepository.delete(claim);
     }
 
-    public List<Claim> getMyC laims() {
+    public List<Claim> getMyClaims() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
