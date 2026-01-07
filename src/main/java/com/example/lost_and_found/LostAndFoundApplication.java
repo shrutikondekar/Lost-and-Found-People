@@ -2,6 +2,7 @@ package com.example.lost_and_found;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+//backend finalized
 
 @SpringBootApplication
 public class LostAndFoundApplication {
