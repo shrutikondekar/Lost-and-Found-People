@@ -39,9 +39,13 @@ public class SecurityConfig {
             	    .requestMatchers("/api/found-items/public/**").permitAll()
             	    .requestMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
             	    .requestMatchers("/v3/api-docs/**", "/v3/api-docs").permitAll()
-            	    .requestMatchers("/api/admin/**").hasRole("ADMIN")
-            	    .requestMatchers("/api/volunteer/**").hasAnyRole("ADMIN", "VOLUNTEER")
-            	    .anyRequest().authenticated()
+            	    .requestMatchers("/api/admin/**").permitAll()
+                    .requestMatchers("/api/volunteer/**").hasAnyRole("ADMIN", "VOLUNTEER")
+                    .requestMatchers("/app", "/index.html","/admin.html", "/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                    .requestMatchers("/api/items/**", "/api/lost-items/**", "/api/found-items/**").permitAll()
+                    .requestMatchers("/admin", "/admin/**").permitAll()
+
+                    .anyRequest().authenticated()
             	)
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
