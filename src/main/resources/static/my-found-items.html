@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Reported Found Items | Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>My Reported Found Items</h1>
+    <nav>
+        <a href="dashboard.html">Back to Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <table id="my-found-items-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Person Name</th>
+                <th>Description</th>
+                <th>Location Found</th>
+                <th>Date Found</th>
+                <th>Contact</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="my-found-items-table-body">
+            <!-- Found item data will be inserted here -->
+        </tbody>
+    </table>
+    <p id="no-found-items-message" style="display: none;">You haven't reported any found items yet.</p>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // NOTE: Currently, there's no user-specific endpoint for found items.
+        // This will display ALL found items.
+        // If a user-specific endpoint is added (e.g., /api/found-items/my-reports),
+        // update this API call.
+        const response = await fetch_api('/api/found-items/public/all');
+        if (response && response.data) {
+            const tableBody = document.getElementById('my-found-items-table-body');
+            
+            // Filter by current user if 'reportedBy' is available and matches
+            const currentUser = JSON.parse(localStorage.getItem('user'));
+            const userSpecificItems = response.data.filter(item => item.reportedBy && item.reportedBy.id === currentUser.id);
+
+            if (userSpecificItems.length === 0) {
+                document.getElementById('no-found-items-message').style.display = 'block';
+                document.getElementById('my-found-items-table').style.display = 'none';
+                return;
+            }
+
+            const rows = userSpecificItems.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.personName}</td>
+                    <td>${item.description}</td>
+                    <td>${item.location}</td>
+                    <td>${new Date(item.foundDate).toLocaleDateString()}</td>
+                    <td>${item.contactNumber}</td>
+                    <td><span class="status ${item.status.toLowerCase()}">${item.status}</span></td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = rows;
+        }
+    });
+</script>
+
+</body>
+</html>

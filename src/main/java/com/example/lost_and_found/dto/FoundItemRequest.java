@@ -1,22 +1,32 @@
 package com.example.lost_and_found.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public class FoundItemRequest {
 
+    @NotBlank(message = "Person's name is required")
     private String personName;
-    private Integer age;          // ✅ Integer
+    @NotNull(message = "Age is required")
+    private Integer age;
+    @NotBlank(message = "Gender is required")
     private String gender;
+    @NotBlank(message = "Description is required")
     private String description;
+    @NotBlank(message = "Location is required")
     private String location;
+    @NotNull(message = "Found date is required")
     private LocalDate foundDate;
+    @NotBlank(message = "Contact number is required")
     private String contactNumber;
     private String imageUrl;
+    private String status; // Added status field
 
     public FoundItemRequest() {
     }
 
-    // ✅ Constructor fixed (Integer age)
+    // Updated constructor to include status
     public FoundItemRequest(
             String personName,
             Integer age,
@@ -25,7 +35,8 @@ public class FoundItemRequest {
             String location,
             LocalDate foundDate,
             String contactNumber,
-            String imageUrl) {
+            String imageUrl,
+            String status) {
 
         this.personName = personName;
         this.age = age;
@@ -35,6 +46,7 @@ public class FoundItemRequest {
         this.foundDate = foundDate;
         this.contactNumber = contactNumber;
         this.imageUrl = imageUrl;
+        this.status = status;
     }
 
     public String getPersonName() {
@@ -99,5 +111,14 @@ public class FoundItemRequest {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    // New getter and setter for status
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

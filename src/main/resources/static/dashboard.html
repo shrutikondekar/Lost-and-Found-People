@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>User Dashboard</h1>
+    <nav>
+        <a href="dashboard.html">Home</a>
+        <div id="admin-link-container" style="display: none;">
+            <a href="admin.html">Admin Dashboard</a>
+        </div>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <h2>Welcome, <span id="username"></span>!</h2>
+    <p>What would you like to do today?</p>
+
+    <div class="dashboard-menu">
+        <a href="report-lost.html" class="menu-item">
+            <h3>Report a Lost Item</h3>
+            <p>Fill out a form to report something you've lost.</p>
+        </a>
+        <a href="report-found.html" class="menu-item">
+            <h3>Report a Found Item</h3>
+            <p>Report an item that you have found to help it get back to its owner.</p>
+        </a>
+        <a href="view-lost.html" class="menu-item">
+            <h3>View Lost Items</h3>
+            <p>Browse all items that have been reported as lost.</p>
+        </a>
+        <a href="view-found.html" class="menu-item">
+            <h3>View Found Items</h3>
+            <p>Browse all items that have been reported as found.</p>
+        </a>
+        <a href="my-lost-items.html" class="menu-item">
+            <h3>My Lost Items</h3>
+            <p>View the lost items you have reported.</p>
+        </a>
+        <a href="my-found-items.html" class="menu-item">
+            <h3>My Found Items</h3>
+            <p>View the found items you have reported.</p>
+        </a>
+        <a href="my-claims.html" class="menu-item">
+            <h3>My Claims</h3>
+            <p>View the claims you have made on items.</p>
+        </a>
+    </div>
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>

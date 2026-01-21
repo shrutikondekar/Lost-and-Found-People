@@ -1,0 +1,1346 @@
+{
+    "info": {
+        "_postman_id": "f29b710b-8d76-4b92-9a3d-4c3e8a5b2e9c",
+        "name": "Lost & Found API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register User (Positive)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set(\"jwt\", \"");",
+                                    "pm.environment.set(\"adminJwt\", \"");",
+                                    "pm.environment.set(\"lostItemId\", \"");"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200 (OK)\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has success message\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.eql(\"User registered successfully\");",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains id, username, and createdAt keys\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.status).to.be.a('number');",
+                                    "    pm.expect(response.message).to.be.a('string');",
+                                    "    // We don't get the full user object back, just a success message for register",
+                                    "    // Actual user details (id, createdAt) would be validated upon login/me endpoint if returned directly.",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\",\n    \"email\": \"{{testUsername}}@example.com\",\n    \"phone\": \"1234567890\",\n    \"role\": \"USER\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register User (Negative - Invalid Input)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 400 (Bad Request)\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains validation errors\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.eql(\"Validation Failed\");",
+                                    "    pm.expect(response.data).to.be.an('object');",
+                                    "    pm.expect(Object.keys(response.data).length).to.be.above(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"\",\n    \"password\": \"short\",\n    \"email\": \"invalid-email\",\n    \"phone\": \"\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register User (Negative - Duplicate Username/Email)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 400 (Bad Request)\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates duplicate username/email\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.be.oneOf([\"Username already exists\", \"Email already exists\"]);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\",\n    \"email\": \"{{testUsername}}@example.com\",\n    \"phone\": \"1234567890\",\n    \"role\": \"USER\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login User (Positive)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set(\"jwt\", \"");",
+                                    "pm.environment.set(\"adminJwt\", \"");"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200 (OK)\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains token, user id, and role\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.data).to.have.property('token');",
+                                    "    pm.expect(response.data).to.have.property('username');",
+                                    "    pm.expect(response.data).to.have.property('role');",
+                                    "",
+                                    "    pm.environment.set(\"jwt\", response.data.token);",
+                                    "    if (response.data.role === \"ADMIN\") {",
+                                    "        pm.environment.set(\"adminJwt\", response.data.token);",
+                                    "    }",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"{{testPassword}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login User (Negative - Invalid Credentials)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates invalid credentials\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.eql(\"Invalid credentials\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{testUsername}}\",\n    \"password\": \"wrongpassword\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login Admin (Positive)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.environment.set(\"adminJwt\", \"");"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200 (OK)\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains token, user id, and role\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.data).to.have.property('token');",
+                                    "    pm.expect(response.data).to.have.property('username');",
+                                    "    pm.expect(response.data).to.have.property('role');",
+                                    "    pm.expect(response.data.role).to.eql(\"ADMIN\");",
+                                    "",
+                                    "    pm.environment.set(\"adminJwt\", response.data.token);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"{{adminUsername}}\",\n    \"password\": \"{{adminPassword}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Lost Items",
+            "item": [
+                {
+                    "name": "Create Lost Item (Positive)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 201 (Created)\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains item details and status is LOST\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.data).to.have.property('id');",
+                                    "    pm.expect(response.data).to.have.property('personName').and.to.eql('Test Lost Person');",
+                                    "    pm.expect(response.data).to.have.property('description').and.to.eql('Test Lost Item Description');",
+                                    "    pm.expect(response.data).to.have.property('status').and.to.eql('LOST');",
+                                    "    pm.expect(response.data).to.have.property('reportedBy');",
+                                    "    pm.expect(response.data.reportedBy).to.have.property('id');",
+                                    "    pm.expect(response.data).to.have.property('createdAt');",
+                                    "",
+                                    "    pm.environment.set(\"lostItemId\", response.data.id);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"personName\": \"Test Lost Person\",\n    \"age\": 30,\n    \"gender\": \"Male\",\n    \"description\": \"Test Lost Item Description\",\n    \"lastSeenLocation\": \"Park\",\n    \"lostDate\": \"2026-01-15\",\n    \"reporterName\": \"{{testUsername}}\",\n    \"reporterContact\": \"1234567890\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Lost Item (Negative - Invalid Input)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 400 (Bad Request)\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains validation errors\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.eql(\"Validation Failed\");",
+                                    "    pm.expect(response.data).to.be.an('object');",
+                                    "    pm.expect(Object.keys(response.data).length).to.be.above(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"personName\": \"\",\n    \"age\": null,\n    \"gender\": \"\",\n    \"description\": \"\",\n    \"lastSeenLocation\": \"\",\n    \"lostDate\": \"invalid-date\",\n    \"reporterName\": \"\",\n    \"reporterContact\": \"\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Lost Item (Auth - No Token)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Unauthorized\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Unauthorized\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"personName\": \"Unauthorized Person\",\n    \"age\": 25,\n    \"gender\": \"Female\",\n    \"description\": \"Item without auth\",\n    \"lastSeenLocation\": \"Street\",\n    \"lostDate\": \"2026-01-20\",\n    \"reporterName\": \"No Token User\",\n    \"reporterContact\": \"9876543210\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "My Lost Items (Positive)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200 (OK)\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response is an array of lost items\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.data).to.be.an('array');",
+                                    "    if (response.data.length > 0) {",
+                                    "        pm.expect(response.data[0]).to.have.property('id');",
+                                    "        pm.expect(response.data[0]).to.have.property('personName');",
+                                    "        pm.expect(response.data[0]).to.have.property('description');",
+                                    "        pm.expect(response.data[0]).to.have.property('status');",
+                                    "        pm.expect(response.data[0]).to.have.property('reportedBy');",
+                                    "    }",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/my-reports",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "my-reports"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "My Lost Items (Auth - No Token)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Unauthorized\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Unauthorized\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/my-reports",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "my-reports"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Lost Item (Positive)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200 (OK)\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Item details are updated\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.data.id).to.eql(pm.environment.get(\"lostItemId\"));",
+                                    "    pm.expect(response.data.description).to.eql(\"Updated Lost Item Description\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"personName\": \"Test Lost Person\",\n    \"age\": 31,\n    \"gender\": \"Male\",\n    \"description\": \"Updated Lost Item Description\",\n    \"lastSeenLocation\": \"Updated Park\",\n    \"lostDate\": \"2026-01-16\",\n    \"reporterName\": \"{{testUsername}}\",\n    \"reporterContact\": \"1234567890\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/{{lostItemId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "{{lostItemId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Lost Item (Negative - Invalid Input)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 400 (Bad Request)\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains validation errors\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.eql(\"Validation Failed\");",
+                                    "    pm.expect(response.data).to.be.an('object');",
+                                    "    pm.expect(Object.keys(response.data).length).to.be.above(0);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"personName\": \"\",\n    \"age\": null,\n    \"gender\": \"\",\n    \"description\": \"\",\n    \"lastSeenLocation\": \"\",\n    \"lostDate\": \"invalid-date\",\n    \"reporterName\": \"\",\n    \"reporterContact\": \"\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/{{lostItemId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "{{lostItemId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Lost Item (Auth - No Token)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Unauthorized\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Unauthorized\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"personName\": \"Unauthorized Update\",\n    \"age\": 25,\n    \"gender\": \"Female\",\n    \"description\": \"Unauthorized update\",\n    \"lastSeenLocation\": \"Street\",\n    \"lostDate\": \"2026-01-20\",\n    \"reporterName\": \"No Token User\",\n    \"reporterContact\": \"9876543210\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/{{lostItemId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "{{lostItemId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Lost Item (Auth - Forbidden/Not Owner)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// This test assumes a different user's JWT (not adminJwt) is set up to fail",
+                                    "// For automated run, you might need another register/login call here for a second user.",
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('adminJwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 403 (Forbidden)\", function () {",
+                                    "    pm.response.to.have.status(403);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Forbidden access\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Access Denied\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"personName\": \"Forbidden Update\",\n    \"age\": 25,\n    \"gender\": \"Female\",\n    \"description\": \"Forbidden update\",\n    \"lastSeenLocation\": \"Street\",\n    \"lostDate\": \"2026-01-20\",\n    \"reporterName\": \"Other User\",\n    \"reporterContact\": \"9876543210\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/{{lostItemId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "{{lostItemId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Lost Item (Negative - Not Found)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 404 (Not Found)\", function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates item not found\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Item not found\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"personName\": \"Not Found Update\",\n    \"age\": 25,\n    \"gender\": \"Female\",\n    \"description\": \"Not Found update\",\n    \"lastSeenLocation\": \"Street\",\n    \"lostDate\": \"2026-01-20\",\n    \"reporterName\": \"Test User\",\n    \"reporterContact\": \"9876543210\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/999999",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "999999"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Lost Item (Positive)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200 (OK)\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates successful deletion\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.eql(\"Lost item deleted successfully\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/{{lostItemId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "{{lostItemId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Lost Item (Auth - No Token)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Unauthorized\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Unauthorized\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/999",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "999"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Lost Item (Auth - Forbidden/Not Owner)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// This test assumes a different user's JWT (not adminJwt) is set up to fail",
+                                    "// For automated run, you might need another register/login call here for a second user.",
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('adminJwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 403 (Forbidden)\", function () {",
+                                    "    pm.response.to.have.status(403);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Forbidden access\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Access Denied\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/999",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "999"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Lost Item (Negative - Not Found)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 404 (Not Found)\", function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates item not found\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Item not found\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/lost-items/999999",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "lost-items",
+                                "999999"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Admin",
+            "item": [
+                {
+                    "name": "Get All Users (Positive - Admin)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('adminJwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200 (OK)\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response is an array of users\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.data).to.be.an('array');",
+                                    "    if (response.data.length > 0) {",
+                                    "        pm.expect(response.data[0]).to.have.property('id');",
+                                    "        pm.expect(response.data[0]).to.have.property('username');",
+                                    "        pm.expect(response.data[0]).to.have.property('email');",
+                                    "        pm.expect(response.data[0]).to.have.property('role');",
+                                    "    }",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "users"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Users (Auth - No Token)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Unauthorized\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Unauthorized\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "users"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Users (Auth - Regular User)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 403 (Forbidden)\", function () {",
+                                    "    pm.response.to.have.status(403);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Forbidden access\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Access Denied\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/users",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "users"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Claims",
+            "item": [
+                {
+                    "name": "Create Claim (Positive)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 201 (Created)\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains claim details\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.data).to.have.property('id');",
+                                    "    pm.expect(response.data).to.have.property('claimant');",
+                                    "    pm.expect(response.data.claimant).to.have.property('id');",
+                                    "    pm.expect(response.data).to.have.property('item');",
+                                    "    pm.expect(response.data.item).to.have.property('id').and.to.eql(pm.environment.get(\"lostItemId\"));",
+                                    "    pm.expect(response.data).to.have.property('claimDate');",
+                                    "    pm.expect(response.data).to.have.property('status').and.to.eql('PENDING');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"item\": {\"id\": {{lostItemId}}},
+    \"claimantDetails\": \"Proof of ownership: blue jacket, 3 buttons\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/claims",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "claims"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Claim (Negative - Invalid Input)",
+                    "event": [
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.request.headers.add({ key: 'Authorization', value: `Bearer ${pm.environment.get('jwt')}` });"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 400 (Bad Request)\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response contains validation errors\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Validation Failed\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"item\": {\"id\": null},
+    \"claimantDetails\": \"\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/claims",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "claims"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Claim (Auth - No Token)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 401 (Unauthorized)\", function () {",
+                                    "    pm.response.to.have.status(401);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response indicates Unauthorized\", function () {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.expect(response.message).to.include(\"Unauthorized\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"item\": {\"id\": 1},
+    \"claimantDetails\": \"Unauthorized Claim\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/claims",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "claims"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}

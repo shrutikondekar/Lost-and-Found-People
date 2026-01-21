@@ -1,92 +1,70 @@
-const BASE_URL = "http://localhost:8080/api/auth"; // update if needed
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
 
-// ---------- REGISTER ----------
-function registerUser(event) {
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegister);
+    }
+});
+
+async function handleLogin(event) {
     event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
 
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+    const response = await fetch_api('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 
-    if (!name || !email || !password) {
-        alert("All fields are mandatory.");
+    if (response && response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        // Fetch user details to get the role
+        await fetchAndStoreUser();
+    }
+}
+
+async function handleRegister(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Basic client-side validation
+    if (data.password !== data.confirmPassword) {
+        alert("Passwords do not match!");
         return;
     }
 
-    const payload = {
-        name: name,
-        email: email,
-        password: password
-    };
+    const response = await fetch_api('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    });
 
-    fetch(`${BASE_URL}/register`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Registration failed");
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert("Registration successful. Please login.");
-            window.location.href = "login.html";
-        })
-        .catch(error => {
-            console.error(error);
-            alert("Registration failed. Try again.");
-        });
-}
-
-// ---------- LOGIN ----------
-function loginUser(event) {
-    event.preventDefault();
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    if (!email || !password) {
-        alert("Email and password are required.");
-        return;
+    if (response) {
+        alert('Registration successful! Please log in.');
+        window.location.href = '/login.html';
     }
-
-    const payload = {
-        email: email,
-        password: password
-    };
-
-    fetch(`${BASE_URL}/login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Login failed");
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Assuming backend sends JWT token
-            localStorage.setItem("token", data.token);
-            alert("Login successful");
-            // redirect to dashboard later
-        })
-        .catch(error => {
-            console.error(error);
-            alert("Invalid credentials");
-        });
 }
 
-// ---------- LOGOUT ----------
-function logoutUser() {
-    localStorage.removeItem("token");
-    alert("Logged out successfully");
-    window.location.href = "login.html";
+async function fetchAndStoreUser() {
+    const userResponse = await fetch_api('/auth/me');
+    if (userResponse && userResponse.data) {
+        localStorage.setItem('user', JSON.stringify(userResponse.data));
+        
+        // Redirect based on role
+        if (userResponse.data.role === 'ADMIN') {
+            window.location.href = '/admin.html';
+        } else {
+            window.location.href = '/dashboard.html';
+        }
+    } else {
+        // Handle case where /me fails after login
+        alert('Could not verify user details. Logging out.');
+        logout();
+    }
 }

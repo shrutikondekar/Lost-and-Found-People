@@ -3,6 +3,8 @@ package com.example.lost_and_found.service;
 import com.example.lost_and_found.dto.FoundItemRequest;
 import com.example.lost_and_found.entity.FoundItem;
 import com.example.lost_and_found.entity.User;
+import com.example.lost_and_found.entity.enums.ItemStatus;
+import com.example.lost_and_found.exception.BadRequestException;
 import com.example.lost_and_found.exception.ResourceNotFoundException;
 import com.example.lost_and_found.repository.FoundItemRepository;
 import com.example.lost_and_found.repository.UserRepository;
@@ -42,7 +44,14 @@ public class FoundItemService {
     }
 
     public List<FoundItem> getFoundItemsByStatus(String status) {
-        return foundItemRepository.findByStatus(status);
+        ItemStatus itemStatus;
+        try {
+            // Convert string status to enum
+            itemStatus = ItemStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid item status: " + status, e);
+        }
+        return foundItemRepository.findByStatus(itemStatus);
     }
 
     public FoundItem createFoundItem(FoundItemRequest request) {
@@ -58,7 +67,7 @@ public class FoundItemService {
         FoundItem foundItem = new FoundItem();
 
         foundItem.setPersonName(request.getPersonName());
-        foundItem.setAge(request.getAge());              // ✅ Integer → Integer
+        foundItem.setAge(request.getAge());
         foundItem.setGender(request.getGender());
         foundItem.setDescription(request.getDescription());
         foundItem.setLocation(request.getLocation());
@@ -66,9 +75,20 @@ public class FoundItemService {
         foundItem.setContactNumber(request.getContactNumber());
         foundItem.setImageUrl(request.getImageUrl());
 
-        foundItem.setStatus("FOUND");
+        // Assign status from request or default to FOUND
+        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
+            try {
+                // Convert string status to enum
+                foundItem.setStatus(ItemStatus.valueOf(request.getStatus().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid item status provided in request: " + request.getStatus(), e);
+            }
+        } else {
+            // Default to FOUND if not provided in the request
+            foundItem.setStatus(ItemStatus.FOUND);
+        }
         foundItem.setReportedBy(user);
-        foundItem.setCreatedAt(LocalDateTime.now());
+        // createdAt and updatedAt are handled by @PrePersist and @PreUpdate
 
         return foundItemRepository.save(foundItem);
     }
@@ -86,12 +106,30 @@ public class FoundItemService {
         foundItem.setContactNumber(request.getContactNumber());
         foundItem.setImageUrl(request.getImageUrl());
 
+        // If status is provided in the request, convert and update it
+        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
+            try {
+                // Convert string status to enum
+                foundItem.setStatus(ItemStatus.valueOf(request.getStatus().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException("Invalid item status provided for update: " + request.getStatus(), e);
+            }
+        }
+        // createdAt and updatedAt are handled by @PrePersist and @PreUpdate
+
         return foundItemRepository.save(foundItem);
     }
 
     public FoundItem updateFoundItemStatus(Long id, String status) {
         FoundItem foundItem = getFoundItemById(id);
-        foundItem.setStatus(status);
+        ItemStatus itemStatus;
+        try {
+            // Convert string status to enum
+            itemStatus = ItemStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Invalid item status: " + status, e);
+        }
+        foundItem.setStatus(itemStatus);
         return foundItemRepository.save(foundItem);
     }
 

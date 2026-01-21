@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,51 +22,57 @@ public class ClaimController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'VOLUNTEER')")
-    public ResponseEntity<ApiResponse> getAllClaims() {
+    public ResponseEntity<ApiResponse<List<Claim>>> getAllClaims() {
         List<Claim> claims = claimService.getAllClaims();
-        return ResponseEntity.ok(new ApiResponse(true, "Claims retrieved successfully", claims));
+        ApiResponse<List<Claim>> response = new ApiResponse<>(HttpStatus.OK.value(), "Claims retrieved successfully", claims, LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getClaimById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Claim>> getClaimById(@PathVariable Long id) {
         Claim claim = claimService.getClaimById(id);
-        return ResponseEntity.ok(new ApiResponse(true, "Claim retrieved successfully", claim));
+        ApiResponse<Claim> response = new ApiResponse<>(HttpStatus.OK.value(), "Claim retrieved successfully", claim, LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/status/{status}")
     @PreAuthorize("hasAnyRole('ADMIN', 'VOLUNTEER')")
-    public ResponseEntity<ApiResponse> getClaimsByStatus(@PathVariable String status) {
+    public ResponseEntity<ApiResponse<List<Claim>>> getClaimsByStatus(@PathVariable String status) {
         List<Claim> claims = claimService.getClaimsByStatus(status);
-        return ResponseEntity.ok(new ApiResponse(true, "Claims retrieved successfully", claims));
+        ApiResponse<List<Claim>> response = new ApiResponse<>(HttpStatus.OK.value(), "Claims retrieved successfully", claims, LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/my-claims")
-    public ResponseEntity<ApiResponse> getMyClaims() {
+    public ResponseEntity<ApiResponse<List<Claim>>> getMyClaims() {
         List<Claim> claims = claimService.getMyClaims();
-        return ResponseEntity.ok(new ApiResponse(true, "Your claims retrieved successfully", claims));
+        ApiResponse<List<Claim>> response = new ApiResponse<>(HttpStatus.OK.value(), "Your claims retrieved successfully", claims, LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> createClaim(@RequestBody Claim claim) {
+    public ResponseEntity<ApiResponse<Claim>> createClaim(@RequestBody Claim claim) {
         Claim createdClaim = claimService.createClaim(claim);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse(true, "Claim created successfully", createdClaim));
+        ApiResponse<Claim> response = new ApiResponse<>(HttpStatus.CREATED.value(), "Claim created successfully", createdClaim, LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('ADMIN', 'VOLUNTEER')")
-    public ResponseEntity<ApiResponse> updateClaimStatus(
+    public ResponseEntity<ApiResponse<Claim>> updateClaimStatus(
             @PathVariable Long id,
             @RequestParam String status,
             @RequestParam String resolvedBy) {
         Claim updatedClaim = claimService.updateClaimStatus(id, status, resolvedBy);
-        return ResponseEntity.ok(new ApiResponse(true, "Claim status updated successfully", updatedClaim));
+        ApiResponse<Claim> response = new ApiResponse<>(HttpStatus.OK.value(), "Claim status updated successfully", updatedClaim, LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse> deleteClaim(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteClaim(@PathVariable Long id) {
         claimService.deleteClaim(id);
-        return ResponseEntity.ok(new ApiResponse(true, "Claim deleted successfully"));
+        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.OK.value(), "Claim deleted successfully", null, LocalDateTime.now());
+        return ResponseEntity.ok(response);
     }
 }

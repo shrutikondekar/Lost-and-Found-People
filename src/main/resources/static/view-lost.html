@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Lost Items | Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>Lost Items</h1>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <div id="item-list" class="item-list">
+        <!-- Items will be dynamically inserted here -->
+    </div>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const response = await fetch_api('/api/lost-items/public/all');
+        if (response && response.data) {
+            const itemList = document.getElementById('item-list');
+            if (response.data.length === 0) {
+                itemList.innerHTML = '<p>No lost items have been reported yet.</p>';
+                return;
+            }
+
+            const itemCards = response.data.map(item => `
+                <div class="item-card">
+                    <img src="${item.imageUrl || 'https://via.placeholder.com/150'}" alt="Item Image">
+                    <div class="item-details">
+                        <h3>${item.personName}</h3>
+                        <p><strong>Status:</strong> ${item.status}</p>
+                        <p><strong>Description:</strong> ${item.description}</p>
+                        <p><strong>Last Seen:</strong> ${item.lastSeenLocation}</p>
+                        <p><strong>Date Lost:</strong> ${new Date(item.lostDate).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            itemList.innerHTML = itemCards;
+        }
+    });
+</script>
+
+</body>
+</html>

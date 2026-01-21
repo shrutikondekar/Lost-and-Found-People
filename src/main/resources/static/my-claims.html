@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Claims | Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>My Claims</h1>
+    <nav>
+        <a href="dashboard.html">Back to Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <table id="my-claims-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item ID</th>
+                <th>Item Name</th>
+                <th>Claim Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="my-claims-table-body">
+            <!-- Claim data will be inserted here -->
+        </tbody>
+    </table>
+    <p id="no-claims-message" style="display: none;">You haven't made any claims yet.</p>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const response = await fetch_api('/api/claims/my-claims');
+        if (response && response.data) {
+            const tableBody = document.getElementById('my-claims-table-body');
+            if (response.data.length === 0) {
+                document.getElementById('no-claims-message').style.display = 'block';
+                document.getElementById('my-claims-table').style.display = 'none';
+                return;
+            }
+
+            const rows = response.data.map(claim => `
+                <tr>
+                    <td>${claim.id}</td>
+                    <td>${claim.item ? claim.item.id : 'N/A'}</td>
+                    <td>${claim.item ? claim.item.personName : 'N/A'}</td>
+                    <td>${new Date(claim.claimDate).toLocaleDateString()}</td>
+                    <td><span class="status ${claim.status.toLowerCase()}">${claim.status}</span></td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = rows;
+        }
+    });
+</script>
+
+</body>
+</html>

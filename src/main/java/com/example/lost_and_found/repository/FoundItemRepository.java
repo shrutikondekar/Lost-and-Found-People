@@ -2,6 +2,7 @@ package com.example.lost_and_found.repository;
 
 import com.example.lost_and_found.entity.FoundItem;
 import com.example.lost_and_found.entity.User;
+import com.example.lost_and_found.entity.enums.ItemStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface FoundItemRepository extends JpaRepository<FoundItem, Long> {
-    List<FoundItem> findByStatus(String status);
+    List<FoundItem> findByStatus(ItemStatus status);
     List<FoundItem> findByReportedBy(User user);
     
     @Query("SELECT f FROM FoundItem f WHERE " +

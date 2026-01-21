@@ -6,11 +6,13 @@ import com.example.lost_and_found.dto.ApiResponse;
 import com.example.lost_and_found.entity.User;
 import com.example.lost_and_found.repository.UserRepository;
 import com.example.lost_and_found.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -19,25 +21,32 @@ import java.util.Map;
 @Service
 public class AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public AuthService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil,
+                       AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+    }
 
     public ApiResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            return new ApiResponse(false, "Username already exists");
+            logger.warn("Registration failed: Username '{}' already exists.", request.getUsername());
+            return new ApiResponse(400, "Username already exists", null, java.time.LocalDateTime.now());
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            return new ApiResponse(false, "Email already exists");
+            logger.warn("Registration failed: Email '{}' already exists.", request.getEmail());
+            return new ApiResponse(400, "Email already exists", null, java.time.LocalDateTime.now());
         }
 
         User user = new User();
@@ -49,8 +58,9 @@ public class AuthService {
         user.setEnabled(true);
 
         userRepository.save(user);
+        logger.info("User '{}' registered successfully.", user.getUsername());
 
-        return new ApiResponse(true, "User registered successfully");
+        return new ApiResponse(200, "User registered successfully", null, java.time.LocalDateTime.now());
     }
 
     public ApiResponse login(LoginRequest request) {
@@ -70,9 +80,20 @@ public class AuthService {
             data.put("email", user.getEmail());
             data.put("role", user.getRole());
 
-            return new ApiResponse(true, "Login successful", data);
+            logger.info("User '{}' logged in successfully.", user.getUsername());
+            return new ApiResponse(200, "Login successful", data, java.time.LocalDateTime.now());
         } catch (Exception e) {
-            return new ApiResponse(false, "Invalid credentials");
+            logger.warn("Login failed for user '{}': Invalid credentials.", request.getUsername());
+            return new ApiResponse(401, "Invalid credentials", null, java.time.LocalDateTime.now());
         }
     }
+
+    public User getMe(UserDetails userDetails) {
+        logger.info("Fetching details for user '{}'.", userDetails.getUsername());
+        return userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
+
+
+    

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Lost Item | Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>Report a Lost Item</h1>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <form id="report-lost-form">
+        <div class="form-group">
+            <label for="personName">Person's Name</label>
+            <input type="text" id="personName" name="personName" required>
+        </div>
+        <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" name="age" required>
+        </div>
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <input type="text" id="gender" name="gender" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="lastSeenLocation">Last Seen Location</label>
+            <input type="text" id="lastSeenLocation" name="lastSeenLocation" required>
+        </div>
+        <div class="form-group">
+            <label for="lostDate">Date Lost</label>
+            <input type="date" id="lostDate" name="lostDate" required>
+        </div>
+        <div class="form-group">
+            <label for="reporterName">Your Name (Reporter)</label>
+            <input type="text" id="reporterName" name="reporterName" required>
+        </div>
+        <div class="form-group">
+            <label for="reporterContact">Your Contact (Reporter)</label>
+            <input type="text" id="reporterContact" name="reporterContact" required>
+        </div>
+        <div class="form-group">
+            <label for="imageUrl">Image URL (Optional)</label>
+            <input type="url" id="imageUrl" name="imageUrl">
+        </div>
+
+        <button type="submit" class="btn">Submit Report</button>
+    </form>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+    document.getElementById('report-lost-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+
+        const response = await fetch_api('/api/lost-items', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+
+        if (response) {
+            alert('Lost item reported successfully!');
+            window.location.href = 'dashboard.html';
+        }
+    });
+</script>
+
+</body>
+</html>

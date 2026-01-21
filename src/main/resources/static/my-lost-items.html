@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Reported Lost Items | Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>My Reported Lost Items</h1>
+    <nav>
+        <a href="dashboard.html">Back to Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <table id="my-lost-items-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Person Name</th>
+                <th>Description</th>
+                <th>Last Seen Location</th>
+                <th>Date Lost</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="my-lost-items-table-body">
+            <!-- Lost item data will be inserted here -->
+        </tbody>
+    </table>
+    <p id="no-lost-items-message" style="display: none;">You haven't reported any lost items yet.</p>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const response = await fetch_api('/api/lost-items/my-reports');
+        if (response && response.data) {
+            const tableBody = document.getElementById('my-lost-items-table-body');
+            if (response.data.length === 0) {
+                document.getElementById('no-lost-items-message').style.display = 'block';
+                document.getElementById('my-lost-items-table').style.display = 'none';
+                return;
+            }
+
+            const rows = response.data.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.personName}</td>
+                    <td>${item.description}</td>
+                    <td>${item.lastSeenLocation}</td>
+                    <td>${new Date(item.lostDate).toLocaleDateString()}</td>
+                    <td><span class="status ${item.status.toLowerCase()}">${item.status}</span></td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = rows;
+        }
+    });
+</script>
+
+</body>
+</html>

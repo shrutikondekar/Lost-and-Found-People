@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Users | Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>Manage Users</h1>
+    <nav>
+        <a href="admin.html">Admin Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <table id="users-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Enabled</th>
+            </tr>
+        </thead>
+        <tbody id="users-table-body">
+            <!-- User data will be inserted here -->
+        </tbody>
+    </table>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const response = await fetch_api('/admin/users');
+        if (response && response.data) {
+            const tableBody = document.getElementById('users-table-body');
+            if (response.data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6">No users found.</td></tr>';
+                return;
+            }
+
+            const rows = response.data.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>${user.role}</td>
+                    <td>${user.enabled}</td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = rows;
+        }
+    });
+</script>
+
+</body>
+</html>

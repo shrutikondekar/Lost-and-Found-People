@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Items | Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>Manage Items</h1>
+    <nav>
+        <a href="admin.html">Admin Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <table id="items-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="items-table-body">
+            <!-- Item data will be inserted here -->
+        </tbody>
+    </table>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', loadItems);
+
+    async function loadItems() {
+        const response = await fetch_api('/admin/items');
+        if (response && response.data) {
+            const tableBody = document.getElementById('items-table-body');
+            if (response.data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6">No items found.</td></tr>';
+                return;
+            }
+
+            const rows = response.data.map(item => `
+                <tr id="item-row-${item.id}">
+                    <td>${item.id}</td>
+                    <td>${item.personName}</td>
+                    <td>${item.description}</td>
+                    <td><span class="status ${item.status.toLowerCase()}">${item.status}</span></td>
+                    <td>${new Date(item.createdAt).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-resolve" onclick="resolveItem(${item.id})" ${item.status === 'RESOLVED' ? 'disabled' : ''}>
+                            Resolve
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = rows;
+        }
+    }
+
+    async function resolveItem(id) {
+        if (!confirm('Are you sure you want to resolve this item?')) {
+            return;
+        }
+
+        const response = await fetch_api(`/admin/items/${id}/resolve`, {
+            method: 'PUT'
+        });
+
+        if (response && response.data) {
+            // Update the status in the UI
+            const row = document.getElementById(`item-row-${id}`);
+            const statusCell = row.querySelector('.status');
+            const button = row.querySelector('.btn-resolve');
+            
+            statusCell.textContent = response.data.status;
+            statusCell.className = `status ${response.data.status.toLowerCase()}`;
+            button.disabled = true;
+            
+            alert('Item resolved successfully!');
+        }
+    }
+</script>
+
+</body>
+</html>

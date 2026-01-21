@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Found Item | Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>Report a Found Item</h1>
+    <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <form id="report-found-form">
+        <div class="form-group">
+            <label for="personName">Person's Name</label>
+            <input type="text" id="personName" name="personName" required>
+        </div>
+        <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" name="age" required>
+        </div>
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <input type="text" id="gender" name="gender" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="location">Location Found</label>
+            <input type="text" id="location" name="location" required>
+        </div>
+        <div class="form-group">
+            <label for="foundDate">Date Found</label>
+            <input type="date" id="foundDate" name="foundDate" required>
+        </div>
+        <div class="form-group">
+            <label for="contactNumber">Your Contact Number</label>
+            <input type="tel" id="contactNumber" name="contactNumber" required>
+        </div>
+        <div class="form-group">
+            <label for="imageUrl">Image URL (Optional)</label>
+            <input type="url" id="imageUrl" name="imageUrl">
+        </div>
+
+        <button type="submit" class="btn">Submit Report</button>
+    </form>
+</main>
+
+<script src="js/api.js"></script>
+<script>
+    document.getElementById('report-found-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData.entries());
+
+        const response = await fetch_api('/api/found-items', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+
+        if (response) {
+            alert('Found item reported successfully!');
+            window.location.href = 'dashboard.html';
+        }
+    });
+</script>
+
+</body>
+</html>

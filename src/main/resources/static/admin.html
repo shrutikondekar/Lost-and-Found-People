@@ -2,9 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Admin Dashboard | Lost & Found</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth-guard.js"></script>
 </head>
 <body>
+
+<header>
+    <h1>Admin Dashboard</h1>
+    <nav>
+        <a href="dashboard.html">User Dashboard</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+</header>
+
+<main class="container">
+    <h2>Admin Tools</h2>
+    <div class="dashboard-menu">
+        <a href="admin-users.html" class="menu-item">
+            <h3>Manage Users</h3>
+            <p>View and manage all registered users.</p>
+        </a>
+        <a href="admin-items.html" class="menu-item">
+            <h3>Manage Items</h3>
+            <p>View, update, and resolve all reported items.</p>
+        </a>
+    </div>
+</main>
+
+<script src="js/api.js"></script>
 
 </body>
 </html>

@@ -1,28 +1,39 @@
 package com.example.lost_and_found.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public class LostItemRequest {
 
+    @NotBlank(message = "Person's name is required")
     private String personName;
+    @NotNull(message = "Age is required")
     private Integer age;
+    @NotBlank(message = "Gender is required")
     private String gender;
+    @NotBlank(message = "Description is required")
     private String description;
+    @NotBlank(message = "Last seen location is required")
     private String lastSeenLocation;
+    @NotNull(message = "Lost date is required")
     private LocalDate lostDate;
+    @NotBlank(message = "Reporter name is required")
     private String reporterName;
+    @NotBlank(message = "Reporter contact is required")
     private String reporterContact;
     private String imageUrl;
+    private String status; // Added status field
 
     // No-args constructor
     public LostItemRequest() {
     }
 
-    // All-args constructor
+    // All-args constructor - updated to include status
     public LostItemRequest(String personName, Integer age, String gender,
                            String description, String lastSeenLocation,
                            LocalDate lostDate, String reporterName,
-                           String reporterContact, String imageUrl) {
+                           String reporterContact, String imageUrl, String status) {
         this.personName = personName;
         this.age = age;
         this.gender = gender;
@@ -32,6 +43,7 @@ public class LostItemRequest {
         this.reporterName = reporterName;
         this.reporterContact = reporterContact;
         this.imageUrl = imageUrl;
+        this.status = status;
     }
 
     public String getPersonName() {
@@ -104,5 +116,14 @@ public class LostItemRequest {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    // New getter and setter for status
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
